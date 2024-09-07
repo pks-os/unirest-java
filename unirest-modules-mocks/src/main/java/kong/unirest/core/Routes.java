@@ -74,14 +74,6 @@ class Routes implements Assert {
     }
 
     private Optional<Invocation> getBestMatch(HttpRequest request) {
-        Optional<Invocation> i = getBestMatch(request, true);
-        if(i.isPresent()){
-            return i;
-        }
-        return getBestMatch(request, false);
-    }
-
-    private Optional<Invocation> getBestMatch(HttpRequest request, boolean expected) {
         Map<Integer, Invocation> map = new TreeMap<>();
         invokes.stream()
                 .forEach(i -> {
