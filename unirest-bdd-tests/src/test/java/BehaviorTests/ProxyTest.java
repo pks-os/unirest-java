@@ -33,7 +33,7 @@ import kong.unirest.core.Unirest;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled // The Janky Proxy is pretty janky and isn't entirely stable in CI
+//@Disabled // The Janky Proxy is pretty janky and isn't entirely stable in CI
 class ProxyTest extends BddTest {
 
     @AfterEach
@@ -51,6 +51,28 @@ class ProxyTest extends BddTest {
         Unirest.config().proxy(new Proxy("localhost", 7777));
 
         Unirest.get(MockServer.GET)
+                .asObject(RequestCapture.class)
+                .getBody()
+                .assertStatus(200);
+
+        assertTrue(JankyProxy.wasUsed());
+    }
+
+    @Test
+    void canUseAuthProxy() {
+        JankyProxy.runServer("localhost", 4567, 7777);
+
+//        System.setProperty("http.proxyUser", "ftproxy");
+//        System.setProperty("http.proxyPassword", "**************");
+//        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+
+        Unirest.config().proxy(new Proxy("localhost", 7777, "ftproxy", "**************"));
+
+
+
+
+        Unirest.get(MockServer.GET)
+                .header("Proxy-Authentication", "fuck")
                 .asObject(RequestCapture.class)
                 .getBody()
                 .assertStatus(200);
